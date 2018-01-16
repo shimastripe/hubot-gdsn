@@ -126,7 +126,7 @@ module.exports = robot => {
     return;
   }
 
-  new CronJob('*/5 * * * * *', async () => {
+  new CronJob('* */1 * * * *', async () => {
     robot.logger.debug("Get github dashboard");
     let eventList = await getEvent();
 
