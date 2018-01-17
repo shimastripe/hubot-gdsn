@@ -135,6 +135,7 @@ module.exports = robot => {
       return;
     }
 
+    robot.logger.debug(_.differenceWith(eventList, cache, _.isEqual));
     _.forEach(_.reverse(_.differenceWith(eventList, cache, _.isEqual)), (event) => {
       robot.messageRoom(GH_AC_CHANNEL, {
         "username": event.actor.display_login,
