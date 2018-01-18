@@ -2,8 +2,6 @@ const GITHUB_DASHBOARD_API = process.env.GITHUB_DASHBOARD_API
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 const GH_AC_CHANNEL = process.env.GH_AC_CHANNEL
 
-let cache = [];
-
 const _ = require('lodash');
 const request = require('request');
 const randomColor = require('randomcolor');
@@ -126,25 +124,31 @@ module.exports = robot => {
     return;
   }
 
-  new CronJob('0 */5 * * * *', async () => {
+  let cache = [];
+
+  new CronJob('0 */5 * * * *', () => {
     robot.logger.debug("Get github dashboard");
-    let eventList = await getEvent();
+    getEvent()
+      .then(eventList => {
+        if (cache.length === 0) {
+          cache = eventList;
+          return;
+        }
 
-    if (cache.length === 0) {
-      cache = eventList;
-      return;
-    }
+        let notifyList = _.reverse(_.differenceWith(eventList, cache, _.isEqual));
+        robot.logger.debug(notifyList);
+        cache = eventList;
 
-    robot.logger.debug(_.differenceWith(eventList, cache, _.isEqual));
-    _.forEach(_.reverse(_.differenceWith(eventList, cache, _.isEqual)), (event) => {
-      robot.messageRoom(GH_AC_CHANNEL, {
-        "username": event.actor.display_login,
-        "icon_url": event.actor.avatar_url,
-        "attachments": [formatAtt(event)],
-        "as_user": false
+        robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
+          return {
+            "username": event.actor.display_login,
+            "icon_url": event.actor.avatar_url,
+            "attachments": [formatAtt(event)],
+            "as_user": false
+          };
+        })));
+      }).catch(err => {
+        console.error(err)
       });
-    });
-
-    cache = eventList;
   }, null, true, 'Asia/Tokyo');
 }
