@@ -124,21 +124,21 @@ module.exports = robot => {
     return;
   }
 
-  let cache = [];
+  let cache = { eventList: [] };
 
   new CronJob('0 */5 * * * *', () => {
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
-        if (cache.length === 0) {
-          cache = eventList;
+        if (cache.eventList.length === 0) {
+          cache.eventList = eventList;
           return;
         }
 
-        let notifyList = _.reverse(_.differenceWith(eventList, cache, _.isEqual));
-        robot.logger.debug(cache);
-        cache = eventList;
-        robot.logger.debug(cache);
+        let notifyList = _.reverse(_.differenceWith(eventList, cache.eventList, _.isEqual));
+        robot.logger.debug(cache.eventList);
+        cache.eventList = eventList;
+        robot.logger.debug(cache.eventList);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
           return {
