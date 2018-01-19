@@ -136,8 +136,9 @@ module.exports = robot => {
         }
 
         let notifyList = _.reverse(_.differenceWith(eventList, cache, _.isEqual));
-        robot.logger.debug(notifyList);
+        robot.logger.debug(cache);
         cache = eventList;
+        robot.logger.debug(cache);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
           return {
