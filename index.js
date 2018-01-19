@@ -130,14 +130,21 @@ module.exports = robot => {
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
+        robot.logger.debug("cache0");
+        robot.logger.debug(cache.eventList);
+        robot.logger.debug("eventList");
+        robot.logger.debug(eventList);
+
         if (cache.eventList.length === 0) {
           cache.eventList = eventList;
           return;
         }
 
         let notifyList = _.reverse(_.differenceWith(eventList, cache.eventList, _.isEqual));
+        robot.logger.debug("cache1");
         robot.logger.debug(cache.eventList);
         cache.eventList = eventList;
+        robot.logger.debug("cache2");
         robot.logger.debug(cache.eventList);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
@@ -149,7 +156,7 @@ module.exports = robot => {
           };
         })));
       }).catch(err => {
-        console.error(err)
+        robot.logger.error(err);
       });
   }, null, true, 'Asia/Tokyo');
 }
