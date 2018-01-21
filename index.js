@@ -128,7 +128,7 @@ module.exports = robot => {
 
   let cache = [];
 
-  new CronJob('0 */1 * * * *', () => {
+  new CronJob('0 */5 * * * *', () => {
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
