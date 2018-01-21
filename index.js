@@ -127,6 +127,7 @@ module.exports = robot => {
   let cache = { eventList: [] };
 
   new CronJob('0 */5 * * * *', () => {
+    console.log(111111111111111111111111111111111);
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
@@ -135,13 +136,13 @@ module.exports = robot => {
           return;
         }
         robot.logger.debug("cache0");
-        robot.logger.debug(_.map(cache.eventList, (d) => { d.id, d.type }));
+        robot.logger.debug(_.map(cache.eventList, (d) => d.id));
         robot.logger.debug("eventList");
-        robot.logger.debug(_.map(eventList, (d) => { d.id, d.type }));
+        robot.logger.debug(_.map(eventList, (d) => d.id));
 
         let notifyList = _.reverse(_.differenceWith(eventList, cache.eventList, _.isEqual));
         robot.logger.debug("cache1");
-        robot.logger.debug(cache.eventList.length);
+        robot.logger.debug(_.map(cache.eventList, (d) => d.id));
         robot.logger.debug(notifyList);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
