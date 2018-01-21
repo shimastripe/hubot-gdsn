@@ -7,7 +7,7 @@ const request = require('request');
 const randomColor = require('randomcolor');
 const CronJob = require('cron').CronJob;
 
-const getEvent = async() => {
+const getEvent = async () => {
   return new Promise((resolve, reject) => {
     let options = {
       url: `${GITHUB_DASHBOARD_API}?access_token=${GITHUB_TOKEN}`,
@@ -110,8 +110,8 @@ const formatAtt = (event) => {
       }
       att.fallback, att.text = text, text;
       break;
-      // case "WatchEvent":
-      //   break;
+    // case "WatchEvent":
+    //   break;
     default:
       text = "拾いきれてないイベントだよ!!報告してください"
       att.fallback, att.text = text, text;
@@ -126,27 +126,34 @@ module.exports = robot => {
     return;
   }
 
-  let cache = {
-    eventList: []
-  };
+  let cache = [];
 
-  new CronJob('0 */5 * * * *', () => {
+  new CronJob('0 */1 * * * *', () => {
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
-        if (cache.eventList.length === 0) {
-          cache.eventList = eventList;
+        if (cache.length === 0) {
+          cache = _.map(eventList, (d) => d.id);
           return;
         }
+
         robot.logger.debug("cache0");
-        robot.logger.debug(_.map(cache.eventList, (d) => d.id));
+        robot.logger.debug(cache);
         robot.logger.debug("eventList");
         robot.logger.debug(_.map(eventList, (d) => d.id));
 
-        let notifyList = _.reverse(_.differenceWith(eventList, cache.eventList, _.isEqual));
-        cache.eventList = eventList;
+        let idList = _.difference(_.map(eventList, (d) => d.id), cache);
+        robot.logger.debug("idList");
+        robot.logger.debug(idList);
+        let notifyList = _.reverse(_.filter(eventList, (ev) => {
+          if (_.includes(idList, ev.id)) {
+            return true;
+          }
+          return false;
+        }))
+
+        cache = _.map(eventList, (d) => d.id);
         robot.logger.debug("cache1");
-        robot.logger.debug(_.map(cache.eventList, (d) => d.id));
         robot.logger.debug(notifyList);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
