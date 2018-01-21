@@ -7,7 +7,7 @@ const request = require('request');
 const randomColor = require('randomcolor');
 const CronJob = require('cron').CronJob;
 
-const getEvent = async () => {
+const getEvent = async() => {
   return new Promise((resolve, reject) => {
     let options = {
       url: `${GITHUB_DASHBOARD_API}?access_token=${GITHUB_TOKEN}`,
@@ -62,15 +62,17 @@ const formatAtt = (event) => {
         let sha = c.sha.slice(0, 7);
         let shaURL = c.url.replace("api.github.com/repos", "github.com").replace("commits", "commit");
         let shaTag = `\`<${shaURL}|${sha}>\``;
-        return { value: `${shaTag}  ${c.message}` };
+        return {
+          value: `${shaTag}  ${c.message}`
+        };
       });
       break;
     case "IssuesEvent":
       text = `${event.payload.action} an issue in ${repoTag}`;
       att.fallback, att.text = text, text;
-      att.fields = [
-        { value: `*<${event.payload.issue.html_url}|#${event.payload.issue.number} ${event.payload.issue.title}>*` }
-      ]
+      att.fields = [{
+        value: `*<${event.payload.issue.html_url}|#${event.payload.issue.number} ${event.payload.issue.title}>*`
+      }]
       break;
     case "MemberEvent":
       text = `${event.payload.action} *<${event.payload.member.html_url}|${event.payload.member.login}>* to ${repoTag}`;
@@ -81,24 +83,24 @@ const formatAtt = (event) => {
       let commitTag = `*<${event.payload.comment.html_url}|${event.repo.name}@${sha}>*`;
       text = `commentd on commit ${commitTag}`;
       att.fallback, att.text = text, text;
-      att.fields = [
-        { value: `> ${event.payload.comment.body}` }
-      ]
+      att.fields = [{
+        value: `> ${event.payload.comment.body}`
+      }]
       break;
     case "PullRequestEvent":
       text = `${event.payload.action} an pull request in ${repoTag}`;
       att.fallback, att.text = text, text;
-      att.fields = [
-        { value: `*<${event.payload.pull_request.html_url}|#${event.payload.pull_request.number} ${event.payload.pull_request.title}>*` }
-      ]
+      att.fields = [{
+        value: `*<${event.payload.pull_request.html_url}|#${event.payload.pull_request.number} ${event.payload.pull_request.title}>*`
+      }]
       break;
     case "IssueCommentEvent":
       let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
       text = `commentd on pull request ${issueCommentTag}`;
       att.fallback, att.text = text, text;
-      att.fields = [
-        { value: `> ${event.payload.comment.body}` }
-      ]
+      att.fields = [{
+        value: `> ${event.payload.comment.body}`
+      }]
       break;
     case "DeleteEvent":
       if (event.payload.ref === null) {
@@ -108,8 +110,8 @@ const formatAtt = (event) => {
       }
       att.fallback, att.text = text, text;
       break;
-    // case "WatchEvent":
-    //   break;
+      // case "WatchEvent":
+      //   break;
     default:
       text = "拾いきれてないイベントだよ!!報告してください"
       att.fallback, att.text = text, text;
@@ -124,10 +126,11 @@ module.exports = robot => {
     return;
   }
 
-  let cache = { eventList: [] };
+  let cache = {
+    eventList: []
+  };
 
   new CronJob('0 */5 * * * *', () => {
-    console.log(111111111111111111111111111111111);
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
@@ -141,6 +144,7 @@ module.exports = robot => {
         robot.logger.debug(_.map(eventList, (d) => d.id));
 
         let notifyList = _.reverse(_.differenceWith(eventList, cache.eventList, _.isEqual));
+        cache.eventList = eventList;
         robot.logger.debug("cache1");
         robot.logger.debug(_.map(cache.eventList, (d) => d.id));
         robot.logger.debug(notifyList);
