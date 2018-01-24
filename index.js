@@ -137,11 +137,6 @@ module.exports = robot => {
           return;
         }
 
-        robot.logger.debug("cache0");
-        robot.logger.debug(cache);
-        robot.logger.debug("eventList");
-        robot.logger.debug(_.map(eventList, (d) => d.id));
-
         let idList = _.difference(_.map(eventList, (d) => d.id), cache);
         robot.logger.debug("idList");
         robot.logger.debug(idList);
@@ -153,7 +148,7 @@ module.exports = robot => {
         }))
 
         cache = _.map(eventList, (d) => d.id);
-        robot.logger.debug("cache1");
+        robot.logger.debug("notifyList");
         robot.logger.debug(notifyList);
 
         robot.messageRoom(GH_AC_CHANNEL, ...(_.map(notifyList, (event) => {
