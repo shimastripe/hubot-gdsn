@@ -81,7 +81,7 @@ const formatAtt = (event) => {
     case "CommitCommentEvent":
       let sha = event.payload.comment.commit_id.slice(0, 7);
       let commitTag = `*<${event.payload.comment.html_url}|${event.repo.name}@${sha}>*`;
-      text = `commentd on commit ${commitTag}`;
+      text = `commented on commit ${commitTag}`;
       att.fallback, att.text = text, text;
       att.fields = [{
         value: `> ${event.payload.comment.body}`
@@ -96,7 +96,7 @@ const formatAtt = (event) => {
       break;
     case "IssueCommentEvent":
       let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
-      text = `commentd on pull request ${issueCommentTag}`;
+      text = `commented on issue or PR ${issueCommentTag}`;
       att.fallback, att.text = text, text;
       att.fields = [{
         value: `> ${event.payload.comment.body}`
