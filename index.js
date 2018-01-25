@@ -7,7 +7,7 @@ const request = require('request');
 const randomColor = require('randomcolor');
 const CronJob = require('cron').CronJob;
 
-const getEvent = async () => {
+const getEvent = async() => {
   return new Promise((resolve, reject) => {
     let options = {
       url: `${GITHUB_DASHBOARD_API}?access_token=${GITHUB_TOKEN}`,
@@ -47,17 +47,56 @@ const formatAtt = (event) => {
 
   let text = ''
   switch (event.type) {
+    case "CommitCommentEvent":
+      let sha = event.payload.comment.commit_id.slice(0, 7);
+      let commitTag = `*<${event.payload.comment.html_url}|${event.repo.name}@${sha}>*`;
+      text = `commented on commit ${commitTag}`;
+      att.fields = [{
+        value: `> ${event.payload.comment.body}`
+      }]
+      break;
     case "CreateEvent":
       if (event.payload.ref === null) {
         text = `created a ${event.payload.ref_type} at ${repoTag}`;
       } else {
         text = `created a ${event.payload.ref_type} ${branchTag} at ${repoTag}`;
       }
-      att.fallback, att.text = text, text;
+      break;
+    case "DeleteEvent":
+      if (event.payload.ref === null) {
+        text = `deleted ${event.payload.ref_type} at ${repoTag}`;
+      } else {
+        text = `deleted ${event.payload.ref_type} ${event.payload.ref.replace("refs/heads/", "")} at ${repoTag}`;
+      }
+      break;
+    case "ForkEvent":
+      let forkBranchTag = `*<${event.payload.forkee.html_url}|${event.payload.forkee.full_name}>*`;
+      text = `forked ${forkBranchTag} from ${repoTag}`;
+      break;
+    case "IssuesEvent":
+      text = `${event.payload.action} an issue in ${repoTag}`;
+      att.fields = [{
+        value: `*<${event.payload.issue.html_url}|#${event.payload.issue.number} ${event.payload.issue.title}>*`
+      }]
+      break;
+    case "IssueCommentEvent":
+      let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
+      text = `commented on issue or PR ${issueCommentTag}`;
+      att.fields = [{
+        value: `> ${event.payload.comment.body}`
+      }];
+      break;
+    case "MemberEvent":
+      text = `${event.payload.action} *<${event.payload.member.html_url}|${event.payload.member.login}>* to ${repoTag}`;
+      break;
+    case "PullRequestEvent":
+      text = `${event.payload.action} an pull request in ${repoTag}`;
+      att.fields = [{
+        value: `*<${event.payload.pull_request.html_url}|#${event.payload.pull_request.number} ${event.payload.pull_request.title}>*`
+      }]
       break;
     case "PushEvent":
       text = `pushed to ${branchTag} in ${repoTag}`;
-      att.fallback, att.text = text, text;
       att.fields = _.map(_.reverse(event.payload.commits), (c) => {
         let sha = c.sha.slice(0, 7);
         let shaURL = c.url.replace("api.github.com/repos", "github.com").replace("commits", "commit");
@@ -67,56 +106,18 @@ const formatAtt = (event) => {
         };
       });
       break;
-    case "IssuesEvent":
-      text = `${event.payload.action} an issue in ${repoTag}`;
-      att.fallback, att.text = text, text;
+    case "ReleaseEvent":
+      let releaseTag = `*<${event.payload.html_url}|${event.payload.release.name}>*`;
+      text = `released  at ${repoTag}`;
       att.fields = [{
-        value: `*<${event.payload.issue.html_url}|#${event.payload.issue.number} ${event.payload.issue.title}>*`
-      }]
+        value: `*<${repoURL}/archive/${event.payload.release.tag_name}.zip|Source code (zip)>*`
+      }];
       break;
-    case "MemberEvent":
-      text = `${event.payload.action} *<${event.payload.member.html_url}|${event.payload.member.login}>* to ${repoTag}`;
-      att.fallback, att.text = text, text;
-      break;
-    case "CommitCommentEvent":
-      let sha = event.payload.comment.commit_id.slice(0, 7);
-      let commitTag = `*<${event.payload.comment.html_url}|${event.repo.name}@${sha}>*`;
-      text = `commented on commit ${commitTag}`;
-      att.fallback, att.text = text, text;
-      att.fields = [{
-        value: `> ${event.payload.comment.body}`
-      }]
-      break;
-    case "PullRequestEvent":
-      text = `${event.payload.action} an pull request in ${repoTag}`;
-      att.fallback, att.text = text, text;
-      att.fields = [{
-        value: `*<${event.payload.pull_request.html_url}|#${event.payload.pull_request.number} ${event.payload.pull_request.title}>*`
-      }]
-      break;
-    case "IssueCommentEvent":
-      let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
-      text = `commented on issue or PR ${issueCommentTag}`;
-      att.fallback, att.text = text, text;
-      att.fields = [{
-        value: `> ${event.payload.comment.body}`
-      }]
-      break;
-    case "DeleteEvent":
-      if (event.payload.ref === null) {
-        text = `deleted ${event.payload.ref_type} at ${repoTag}`;
-      } else {
-        text = `deleted ${event.payload.ref_type} ${event.payload.ref.replace("refs/heads/", "")} at ${repoTag}`;
-      }
-      att.fallback, att.text = text, text;
-      break;
-    // case "WatchEvent":
-    //   break;
     default:
       text = "拾いきれてないイベントだよ!!報告してください"
-      att.fallback, att.text = text, text;
       break;
   }
+  att.fallback, att.text = text, text;
 
   return att;
 };
