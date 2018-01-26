@@ -31,8 +31,16 @@ const getEvent = async() => {
 };
 
 const formatAtt = (event) => {
+  const colorPrimary = "#00d1b2";
+  const colorLink = "#3273dc";
+  const colorInfo = "#209cee";
+  const colorSuccess = "#23d160";
+  const colorWarning = "#ffdd57";
+  const colorDanger = "#ff3860";
+  const colorDark = "#363636";
+
   let att = {
-    color: randomColor(),
+    color: colorDark,
     mrkdwn_in: ["text", "fields"]
   };
 
@@ -54,6 +62,7 @@ const formatAtt = (event) => {
       att.fields = [{
         value: `> ${event.payload.comment.body}`
       }]
+      att.color = colorInfo;
       break;
     case "CreateEvent":
       if (event.payload.ref === null) {
@@ -61,6 +70,7 @@ const formatAtt = (event) => {
       } else {
         text = `created a ${event.payload.ref_type} ${branchTag} at ${repoTag}`;
       }
+      att.color = colorSuccess;
       break;
     case "DeleteEvent":
       if (event.payload.ref === null) {
@@ -68,16 +78,24 @@ const formatAtt = (event) => {
       } else {
         text = `deleted ${event.payload.ref_type} ${event.payload.ref.replace("refs/heads/", "")} at ${repoTag}`;
       }
+      att.color = colorDanger;
       break;
     case "ForkEvent":
       let forkBranchTag = `*<${event.payload.forkee.html_url}|${event.payload.forkee.full_name}>*`;
       text = `forked ${forkBranchTag} from ${repoTag}`;
+      att.color = colorLink;
       break;
     case "IssuesEvent":
       text = `${event.payload.action} an issue in ${repoTag}`;
       att.fields = [{
         value: `*<${event.payload.issue.html_url}|#${event.payload.issue.number} ${event.payload.issue.title}>*`
       }]
+
+      if (event.payload.action === "opened") {
+        att.color = colorSuccess;
+      } else {
+        att.color = colorDanger;
+      }
       break;
     case "IssueCommentEvent":
       let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
@@ -85,15 +103,23 @@ const formatAtt = (event) => {
       att.fields = [{
         value: `> ${event.payload.comment.body}`
       }];
+      att.color = colorWarning;
       break;
     case "MemberEvent":
       text = `${event.payload.action} *<${event.payload.member.html_url}|${event.payload.member.login}>* to ${repoTag}`;
+      att.color = colorInfo;
       break;
     case "PullRequestEvent":
       text = `${event.payload.action} an pull request in ${repoTag}`;
       att.fields = [{
         value: `*<${event.payload.pull_request.html_url}|#${event.payload.pull_request.number} ${event.payload.pull_request.title}>*`
       }]
+
+      if (event.payload.action === "opened") {
+        att.color = colorSuccess;
+      } else {
+        att.color = colorDanger;
+      }
       break;
     case "PushEvent":
       text = `pushed to ${branchTag} in ${repoTag}`;
@@ -105,6 +131,7 @@ const formatAtt = (event) => {
           value: `${shaTag}  ${c.message}`
         };
       });
+      att.color = colorLink;
       break;
     case "ReleaseEvent":
       let releaseTag = `*<${event.payload.html_url}|${event.payload.release.name}>*`;
@@ -112,9 +139,10 @@ const formatAtt = (event) => {
       att.fields = [{
         value: `*<${repoURL}/archive/${event.payload.release.tag_name}.zip|Source code (zip)>*`
       }];
+      att.color = colorPrimary;
       break;
     default:
-      text = "拾いきれてないイベントだよ!!報告してください"
+      text = "拾いきれてないイベントだよ!!報告してください" + event.type;
       break;
   }
   att.fallback, att.text = text, text;
@@ -129,7 +157,7 @@ module.exports = robot => {
 
   let cache = [];
 
-  new CronJob('0 */5 * * * *', () => {
+  new CronJob('0 */1 * * * *', () => {
     robot.logger.debug("Get github dashboard");
     getEvent()
       .then(eventList => {
