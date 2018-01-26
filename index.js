@@ -93,6 +93,8 @@ const formatAtt = (event) => {
 
       if (event.payload.action === "opened") {
         att.color = colorSuccess;
+      } else if (event.payload.action === "reopened") {
+        att.color = colorInfo;
       } else {
         att.color = colorDanger;
       }
@@ -117,6 +119,8 @@ const formatAtt = (event) => {
 
       if (event.payload.action === "opened") {
         att.color = colorSuccess;
+      } else if (event.payload.action === "reopened") {
+        att.color = colorInfo;
       } else {
         att.color = colorDanger;
       }
