@@ -7,7 +7,7 @@ const request = require('request');
 const randomColor = require('randomcolor');
 const CronJob = require('cron').CronJob;
 
-const getEvent = async() => {
+const getEvent = async () => {
   return new Promise((resolve, reject) => {
     let options = {
       url: `${GITHUB_DASHBOARD_API}?access_token=${GITHUB_TOKEN}`,
@@ -101,7 +101,13 @@ const formatAtt = (event) => {
       break;
     case "IssueCommentEvent":
       let issueCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.issue.number}>*`;
-      text = `commented on issue or PR ${issueCommentTag}`;
+
+      let evType = "issue";
+      if (event.payload.issue.html_url.includes("/pull/")) {
+        evType = "PR";
+      }
+
+      text = `commented on ${evType} ${issueCommentTag}`;
       att.fields = [{
         value: `> ${event.payload.comment.body}`
       }];
