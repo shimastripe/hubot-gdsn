@@ -38,6 +38,7 @@ const formatAtt = (event) => {
   const colorWarning = "#ffdd57";
   const colorDanger = "#ff3860";
   const colorDark = "#363636";
+  const colorWiki = "#bd1e6f";
 
   let att = {
     color: colorDark,
@@ -84,6 +85,14 @@ const formatAtt = (event) => {
       let forkBranchTag = `*<${event.payload.forkee.html_url}|${event.payload.forkee.full_name}>*`;
       text = `forked ${forkBranchTag} from ${repoTag}`;
       att.color = colorLink;
+      break;
+    case "GollumEvent":
+      let wikiTag = `*<${event.payload.pages[0].html_url}|${event.payload.pages[0].page_name}>*`;
+      text = `${event.payload.pages[0].action} a wiki page in ${repoTag}`;
+      att.fields = [{
+        value: `> ${event.payload.pages[0].action} ${wikiTag}`
+      }]
+      att.color = colorWiki;
       break;
     case "IssuesEvent":
       text = `${event.payload.action} an issue in ${repoTag}`;
