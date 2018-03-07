@@ -16,6 +16,6 @@ Then add hubot-github-dashboard-slack-notifier to your `external-scripts.json`:
 ## Option(Required)
 |Option|Description|Example|
 |------|-----------|-------|
-|GITHUB_DASHBOARD_API|Dashboard url|https://api.github.com/users/shimastripe/events https://api.github.com/users/shimastripe/events/orgs/XXXX|
+|GITHUB_DASHBOARD_API|Dashboard url|https://api.github.com/events https://api.github.com/users/shimastripe/events/orgs/XXXX|
 |GITHUB_TOKEN|Access token (repo)|hogehoge|
 |GH_AC_CHANNEL|Slack channel|CHOGEHOGE|
