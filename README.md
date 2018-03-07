@@ -3,6 +3,8 @@
 
 This is a hubot-script to notify update of github's dashboard.
 
+<img width="1148" alt="screen shot 2018-03-08 at 5 23 39" src="https://user-images.githubusercontent.com/15936908/37116361-67303662-2291-11e8-85b8-349159d52d5a.png">
+
 ## Installation
 
 In hubot project repo, run:
