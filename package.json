@@ -1,17 +1,21 @@
 {
   "name": "hubot-github-dashboard-slack-notifier",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "hubot github dashboard slack notifier",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Go Takagi",
-  "license": "ISC",
+  "author": "Go Takagi <takagi@shimastripe.com> (https://github.com/shimastripe)",
+  "license": "MIT",
   "dependencies": {
     "cron": "^1.3.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.5",
     "randomcolor": "^0.5.3",
     "request": "^2.83.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/shimastripe/hubot-github-dashboard-slack-notifier/issues"
+  },
+  "homepage": "https://github.com/shimastripe/hubot-github-dashboard-slack-notifier#readme"
 }
