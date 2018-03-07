@@ -1,4 +1,5 @@
 # hubot-github-dashboard-slack-notifier
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 This is a hubot-script to notify update of github's dashboard.
 
