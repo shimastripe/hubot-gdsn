@@ -39,6 +39,7 @@ const formatAtt = (event) => {
   const colorDanger = "#ff3860";
   const colorDark = "#363636";
   const colorWiki = "#bd1e6f";
+  const colorReview = "#9370db";
 
   let att = {
     color: colorDark,
@@ -139,6 +140,14 @@ const formatAtt = (event) => {
       } else {
         att.color = colorDanger;
       }
+      break;
+    case "PullRequestReviewCommentEvent":
+      let prCommentTag = `*<${event.payload.comment.html_url}|${event.repo.name}#${event.payload.pull_request.number}>*`;
+      text = `reviewed on pull request ${prCommentTag}`;
+      att.fields = [{
+        value: `> ${event.payload.comment.body}`
+      }]
+      att.color = colorReview;
       break;
     case "PushEvent":
       text = `pushed to ${branchTag} in ${repoTag}`;
