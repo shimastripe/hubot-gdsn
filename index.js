@@ -25,7 +25,12 @@ const getEvent = async () => {
         reject(err);
         return
       };
-      resolve(body)
+
+      if (res.statusCode == 200) {
+        resolve(body)
+      }
+
+      reject("Error: cannot get server response")
     });
   });
 };
