@@ -10,9 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "cron": "^1.3.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.10",
     "randomcolor": "^0.5.3",
-    "request": "^2.83.0"
+    "request": "^2.87.0"
   },
   "bugs": {
     "url": "https://github.com/shimastripe/hubot-github-dashboard-slack-notifier/issues"
